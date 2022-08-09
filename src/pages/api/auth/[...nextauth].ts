@@ -11,6 +11,45 @@ export default NextAuth({
     }),
   ],
   callbacks: {
+    async jwt({ token }) {
+      try {
+        const userActiveSubscription = await fauna.query(
+          q.Get(
+            q.Intersection(
+              [
+                q.Match(
+                  q.Index('subscription_by_user_ref'),
+                  q.Select(
+                    'ref',
+                    q.Get(
+                      q.Match(
+                        q.Index('user_by_email'),
+                        q.Casefold(token.email)
+                      )
+                    )
+                  )
+                ),
+                q.Match(
+                  q.Index('subscription_by_status'),
+                  'active'
+                )
+              ]
+            )
+          )
+        )
+
+        token.activeSubscription = userActiveSubscription
+      } catch (error) {
+        console.error(error)
+        token.activeSubscription = null
+      } finally {
+        return token;
+      }
+    },
+    async session({ session, token }) {
+      session.activeSubscription = token.activeSubscription
+      return session
+    },
     async signIn({ user }) {
       const { email } = user
 

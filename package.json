@@ -9,6 +9,9 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@prismicio/client": "^6.6.4",
+    "@prismicio/helpers": "^2.3.3",
+    "@prismicio/react": "^2.4.4",
     "@stripe/stripe-js": "^1.35.0",
     "axios": "^0.27.2",
     "faunadb": "^4.6.0",
